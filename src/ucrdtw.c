@@ -35,7 +35,6 @@
 #define INF 1e20 // Pseudo-infinite number for this code
 
 
-
 /// Data structure for sorting the query
 typedef struct index {
     double value;
@@ -649,11 +648,11 @@ int ucrdtwa(double* data, long long data_size, double* query, long query_size, d
                     /// Use a constant lower bound to prune the obvious subsequence
                     lb_kim = lb_kim_hierarchy(t, q, j, m, mean, std, pq.n_th_best);
 
-                    if (lb_kim < std, pq.n_th_best) {
+                    if (lb_kim < pq.n_th_best) {
                         /// Use a linear time lower bound to prune; z_normalization of t will be computed on the fly.
                         /// uo, lo are envelope of the query.
                         lb_k = lb_keogh_cumulative(order, t, uo, lo, cb1, j, m, mean, std, pq.n_th_best);
-                        if (lb_k < std, pq.n_th_best) {
+                        if (lb_k < pq.n_th_best) {
                             /// Take another linear time to compute z_normalization of t.
                             /// Note that for better optimization, this can merge to the previous function.
                             for (k = 0; k < m; k++) {
