@@ -72,7 +72,28 @@ void pqueue_free(pqueue* d) {
 }
 
 /// Insert to the queue at the back
-void pqueue_insert(pqueue* d, struct candidate c) {
+// void pqueue_insert(pqueue* d, struct candidate c) {
+//     if (c.distance < d->n_th_best) {
+//         candidate  to_insert = c;
+//         candidate  temp;
+//         int pos = 0;
+//         while (pos < d->capacity && pos <= d->size) {
+//             temp = d->dq[pos];
+//             if (pos == d->size || temp.distance > to_insert.distance) {
+//                 d->dq[pos] = to_insert;
+//                 to_insert = temp;
+//             }
+//             pos++;
+//         }
+//         d->size = min(d->capacity, d->size+1);
+//         d->n_th_best = d->dq[d->size-1].distance;
+//     }
+// }
+
+/// Insert to the queue at the back
+void pqueue_insert(pqueue* d, struct candidate c, long min_separation) {
+    //assumption: min_separation is the same for all calls to pqueue_insert with a given d
+    //assumption2: c.index > d_i.index for all d_i in d
     if (c.distance < d->n_th_best) {
         candidate  to_insert = c;
         candidate  temp;
@@ -82,6 +103,10 @@ void pqueue_insert(pqueue* d, struct candidate c) {
             if (pos == d->size || temp.distance > to_insert.distance) {
                 d->dq[pos] = to_insert;
                 to_insert = temp;
+            }
+            if (pos < d->size && llabs(temp.index - c.index) < min_separation) { //if temp and c are too close, one of them must be dropped
+                d->n_th_best = d->dq[d->size-1].distance;
+                return;  //the current value of to_insert gets dropped
             }
             pos++;
         }
@@ -682,7 +707,7 @@ int ucrdtwa(double* data, long long data_size, double* query, long query_size, d
                                 if (dist < pq.n_th_best) { 
                                     loc = (it) * (EPOCH - m + 1) + i - m + 1;
                                     candidate c = { dist, loc };
-                                    pqueue_insert(&pq, c);
+                                    pqueue_insert(&pq, c, m);
                                 }
                             } else
                                 keogh2++;
